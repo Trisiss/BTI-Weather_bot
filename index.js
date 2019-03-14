@@ -48,9 +48,9 @@ bot.onText(/\/start/, (msg, match) => { // функция обработки к�
           console.log("Начальная температура: " + ms_once);
           console.log("Новая температура: " + ms_last);
           console.log("Разница значений температуры: " + Math.abs(ms_once - ms_last));
-          if (Math.round(Math.abs(ms_once - ms_last) >= 5)) { // сравнение предыдущей температуры с новым значением
+          if (Math.abs(ms_once - ms_last) >= 5) { // сравнение предыдущей температуры с новым значением
             if (ms_last > 0) 
-              bot.sendMessage(chatId, "*В Бийске +*" + ms_last + "°C", {"parse_mode":"Markdown"});
+              bot.sendMessage(chatId, "*В Бийске* +" + ms_last + "°C", {"parse_mode":"Markdown"});
             else
               bot.sendMessage(chatId, "*В Бийске *" + ms_last + "°C", {"parse_mode":"Markdown"});
             ms_once = ms_last;
@@ -79,7 +79,7 @@ bot.onText(/\/weather/, (msg, match) => {  // функция обработки 
     parseFloat(ms);
     // console.log(ms);
     if (ms > 0) {
-      bot.sendMessage(chatId, "*В Бийске +*" + ms + "°C", {"parse_mode":"Markdown"});
+      bot.sendMessage(chatId, "*В Бийске* +" + ms + "°C", {"parse_mode":"Markdown"});
     } else {
       bot.sendMessage(chatId, "*В Бийске *" + ms + "°C", {"parse_mode":"Markdown"});
     }
