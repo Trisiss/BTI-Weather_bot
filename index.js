@@ -49,7 +49,10 @@ bot.onText(/\/start/, (msg, match) => { // функция обработки к�
           console.log("Новая температура: " + ms_last);
           console.log("Разница значений температуры: " + Math.abs(ms_once - ms_last));
           if (Math.round(Math.abs(ms_once - ms_last) >= 5)) { // сравнение предыдущей температуры с новым значением
-            bot.sendMessage(chatId, "*Погода в городе по данным БТИ АлтГТУ *" + ms_last + "°C", {"parse_mode":"Markdown"});
+            if (ms_last > 0) 
+              bot.sendMessage(chatId, "*В Бийске +*" + ms_last + "°C", {"parse_mode":"Markdown"});
+            else
+              bot.sendMessage(chatId, "*В Бийске *" + ms_last + "°C", {"parse_mode":"Markdown"});
             ms_once = ms_last;
           }
       });
@@ -71,10 +74,15 @@ bot.onText(/\/weather/, (msg, match) => {  // функция обработки 
     // $('html') = $('html').replace(/\r|\n/g, '');
     var ms = ($('html').text());
     ms = ms.replace(/\r|\n/g, '');
+    ms = ms.replace('°C', '');
     ms = ms.replace(',', '.');
+    parseFloat(ms);
     // console.log(ms);
-
-    bot.sendMessage(chatId, "*Погода в городе по данным БТИ АлтГТУ *" + ms, {"parse_mode":"Markdown"});
+    if (ms > 0) {
+      bot.sendMessage(chatId, "*В Бийске +*" + ms + "°C", {"parse_mode":"Markdown"});
+    } else {
+      bot.sendMessage(chatId, "*В Бийске *" + ms + "°C", {"parse_mode":"Markdown"});
+    }
 }); 
 });
 // }
