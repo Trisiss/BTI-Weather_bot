@@ -295,6 +295,7 @@ request(URL, function (err, res, body) {
       });;
 var v_time = [];
 var v_temp = [];
+// SELECT * FROM (SELECT rowid, t FROM temp_tbl ORDER BY time DESC LIMIT 5) ORDER BY rowid;
 
 // first row only
 // db.each(sql, (err, row) => {

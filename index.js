@@ -10,6 +10,226 @@ const bot = new TelegramBot(token, { polling: true });
 
 const URL = 'http://www.bti.secna.ru/web-thermo/index.shtml'; // источник температуры
 
+function doDraw(config, filename) {
+
+  // создадим полотно с размером 640x480 пикселей
+
+  var chartNode = new ChartjsNode(640, 480);
+
+  return chartNode.drawChart(config)
+
+      .then(() => {
+
+          // запишем результат в файл
+
+          return chartNode.writeImageToFile('image/png', filename);
+
+      });
+
+}
+
+function prepareDraw0(v_time){
+
+  // переменная, куда сохраним данные
+
+  // var пример;
+
+  // создадим Promise сборки данных и конфигурации
+
+  return new Promise((resolve, reject)=>{resolve()})
+
+      // здесь могут быть много шагов сбора данных, прежде чем перейти к графику
+
+     /* .then(()=>{
+
+          // произвольные данные, похожие на те, что хранятся в истории
+
+          пример = [
+
+              {"val":3,"ack":1,"ts":1539063874301},
+
+              {"val":5,"ack":1,"ts":1539063884299},
+
+              {"val":5.3,"ack":1,"ts":1539063894299},
+
+              {"val":3.39,"ack":1,"ts":1539063904301},
+
+              {"val":5.6,"ack":1,"ts":1539063914300},
+
+              {"val":-1.3,"ack":1,"ts":1539063924300},
+
+              {"val":-6.3,"ack":1,"ts":1539063934302},
+
+              {"val":1.23,"ack":1,"ts":1539063944301},
+
+          ];
+
+      })*/
+
+      // финальный шаг - создаем конфигурацию графиков
+
+      .then(()=>{
+
+          const chartJsOptions = {
+
+              // тип графика - линейный
+
+              type: 'line',
+
+        data: {
+
+            // список наборов данных
+
+          datasets: [
+
+            {
+
+                // заголовок ряда 
+
+            label: 'Температура',
+
+            // цвет
+
+            backgroundColor: 'rgb(0, 0, 0)',
+
+            borderColor: 'rgb(0, 0, 0)',
+
+            // размер точек
+
+            pointRadius: 3,
+
+            // ширина линии графика
+
+            borderWidth: 2,
+
+            // достанем данные из переменной 'пример' и оставим только значение и время изменения
+
+            // data: v_temp.map((item) =>{
+            //   v_time.map((el) => {
+            //     return {t: new Date(el)}
+            //   })
+            //   return {y: item}
+            // }),
+            data: v_time.map((item) => {
+              return {y: item.temper, t: new Date(item.tm)}
+          }),
+
+            // заливка графика - нет
+
+            fill: false,
+
+            }
+
+          ]
+    
+        },
+
+        options: {
+
+          // настройка легенды
+
+          legend: {
+
+              labels: {
+
+                  // размер шрифта
+
+                  fontSize: 20,
+
+              },
+
+          },
+
+          // оси координат
+
+          scales: {
+
+              // оси X
+
+            xAxes: [{
+
+                // тип - временная ось
+
+                type: 'time',  
+
+              display: true,
+
+              // метка оси
+
+              scaleLabel: {
+
+                display: true,
+
+                labelString: 'Время'
+
+              },
+
+            }],
+
+            // оси Y
+
+            yAxes: [{
+
+                // тип - линейная
+
+                type: 'linear',
+
+              display: true,
+
+              // метка оси
+
+              scaleLabel: {
+
+                display: true,
+
+                labelString: 'Температура'
+
+              },
+
+            }]
+
+          }
+
+        }
+
+    };
+
+    return chartJsOptions;
+
+      });
+
+}
+
+function sendGraph0(v_time){
+
+  // имя файла, в который положим картинку с графиком
+
+  const filename = 'graph0.png';
+
+  // выполним подготовку данных 
+
+  prepareDraw0(v_time)
+
+      // на след шаге нарисуем
+
+      .then((result) => {
+
+          // рисуем картинку по полученным данным и конфигурации
+
+          return doDraw(result, filename);
+
+      })
+
+
+      .catch((err)=>{
+
+          console.error(err);
+
+      });
+
+}
+
+
 
 setInterval(function () { // функция для повторения запроса температуры
   request(URL, function (err, res, body) {
@@ -67,31 +287,17 @@ setInterval(function () { // функция для повторения запр
       else console.log('No chat');
     });
     db.close();
-
-
-    // ms_once = 2;
-    // console.log("Начальная температура: " + ms_once);
-    // console.log("Новая температура: " + ms_last);
-    // console.log("Разница значений температуры: " + Math.abs(ms_once - ms_last));
-    // if (Math.abs(ms_once - ms_last) >= 5) { // сравнение предыдущей температуры с новым значением
-    //   if (ms_last > 0) 
-    //     bot.sendMessage(chatId, "*В Бийске* +" + ms_last + "°C", {"parse_mode":"Markdown"});
-    //   else
-    //     bot.sendMessage(chatId, "*В Бийске *" + ms_last + "°C", {"parse_mode":"Markdown"});
-    //   ms_once = ms_last;
-    // }
   });
 }, 120000);
 
 
 //-----------------------------------------------------------------------------------------------------
 
-bot.onText(/\/start/, (msg, match) => { // функция обработки команды /start
+bot.onText(/\/start/, msg => { // функция обработки команды /start
   let ms_once; // начальное значение
   const chatId = msg.chat.id; // id чата
   console.log(msg);
   let flag = 0;
-  let flagfol = 0;
 
   let ms = "Здравствуйте! Здесь вы можете узнать текущую температуру в городе по данным БТИ АлтГТУ. Для того, чтобы узнать данные о погоде, введите /w. Для того, чтобы подписаться\/отписаться на обновление погоды, введите /f. Сейчас в Бийске ";
 
@@ -166,7 +372,7 @@ bot.onText(/\/start/, (msg, match) => { // функция обработки к�
 
 //------------------------------------------------------------------------------------------------
 
-bot.onText(/\/w/, (msg, match) => {  // функция обработки команды пользователя
+bot.onText(/\/w/, msg => {  // функция обработки команды пользователя
 
   const chatId = msg.chat.id;
   console.log(msg);
@@ -217,8 +423,7 @@ bot.onText(/\/w/, (msg, match) => {  // функция обработки ком
 
 //--------------------------------------------------------------------------------------------
 
-bot.onText(/\/f/, (msg, match) => {  // функция обработки команды пользователя
-  let flag = 0;
+bot.onText(/\/f/, msg => {  // функция обработки команды пользователя
   const chatId = msg.chat.id;
   console.log(msg);
   let db = new sqlite3.Database('./db/bot.db', (err) => {
@@ -265,11 +470,43 @@ bot.onText(/\/f/, (msg, match) => {  // функция обработки ком
   db.close();
 });
 
+//--------------------------------------------------------------------------------------------
+
+bot.onText(/\/p/, msg => {  // функция обработки команды пользователя
+  const chatId = msg.chat.id;
+  console.log(msg);
+  let v_time = [];
+  let v_temp = [];
+  let db = new sqlite3.Database('./db/bot.db', (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+ let sql = "SELECT * FROM (SELECT rowid, time tm, t temper FROM temp_tbl ORDER BY time DESC LIMIT 5) ORDER BY rowid";
+
+//  first row only
+db.each(sql, (err, row) => {
+  if (err) {
+    return console.error(err.message);
+  }
+    if (row) {
+        v_time.push({"tm":row.tm, "temper":row.temper});
+    // v_time.push(row.tm);
+    console.log(row.tm);
+    //  v_temp.push(row.temper);
+     console.log(row.temper); 
+    }
+    console.log(typeof(v_temp));
+  db.close();
+  sendGraph0(v_temp, v_time);
+});
+});
+
 //----------------------------------------------------------------------------------------------------------
 
 
-bot.on('message', (msg) => {
-  const chatId = msg.chat.id;
+bot.on('message', msg => {
   const user = msg.chat.username;
   let mes = msg.text;
   mes = mes.replace('/', '');
@@ -289,13 +526,11 @@ bot.on('message', (msg) => {
     console.log('Change:' + this.changes);
 
   });
- // db.close();
+ db.close();
   // send a message to the chat acknowledging receipt of their message
   // bot.sendMessage(chatId, 'Неизвестная команда.');
 });
 
-// bot.on('polling_error', (error) => {
-//   console.log(error.code);  // => 'EFATAL'
-// });
+
 
 
