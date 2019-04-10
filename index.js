@@ -2,7 +2,7 @@ const request = require('request');
 const cheerio = require('cheerio');
 const TelegramBot = require('node-telegram-bot-api');
 const sqlite3 = require('sqlite3').verbose();
-
+const ChartjsNode = require('chartjs-node');
 
 const token = ''; // токен бота
 
