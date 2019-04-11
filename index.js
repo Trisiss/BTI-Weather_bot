@@ -20,7 +20,7 @@ function doDraw(config, filename) {
 
       .then(() => {
 
-          // запишем результат в файл
+          // запишем результат в файл 
 
           return chartNode.writeImageToFile('image/png', filename);
 
@@ -40,11 +40,11 @@ function prepareDraw0(v_time){
 
       // здесь могут быть много шагов сбора данных, прежде чем перейти к графику
 
-     /* .then(()=>{
+     .then(()=>{
 
           // произвольные данные, похожие на те, что хранятся в истории
 
-          пример = [
+          testData = [
 
               {"val":3,"ack":1,"ts":1539063874301},
 
@@ -64,7 +64,7 @@ function prepareDraw0(v_time){
 
           ];
 
-      })*/
+      })
 
       // финальный шаг - создаем конфигурацию графиков
 
@@ -110,8 +110,8 @@ function prepareDraw0(v_time){
             //   })
             //   return {y: item}
             // }),
-            data: v_time.map((item) => {
-              return {y: item.temper, t: new Date(item.tm)}
+            data: testData.map((item) => {
+              return {y: item.val, t: new Date(item.ts)}
           }),
 
             // заливка графика - нет
@@ -204,7 +204,7 @@ function sendGraph0(v_time){
 
   // имя файла, в который положим картинку с графиком
 
-  const filename = 'graph0.png';
+  const filename = './graph0.png';
 
   // выполним подготовку данных 
 
@@ -498,9 +498,11 @@ db.each(sql, (err, row) => {
      console.log(row.temper); 
     }
     console.log(typeof(v_temp));
-  db.close();
-  sendGraph0(v_temp, v_time);
+  
 });
+db.close();
+  console.log("TRUE");
+  sendGraph0(v_temp, v_time);
 });
 
 //----------------------------------------------------------------------------------------------------------
