@@ -282,7 +282,7 @@ setInterval(function () { // функция для повторения запр
               return console.error(err.message);
             }
             if (row) {
-              bot.sendMessage(row.id, '*Температура в городе изменилась на пять градусов. Сейчас в Бийске *' + ms_last + '°C');
+              bot.sendMessage(row.id, '*Температура в городе изменилась на пять градусов. Сейчас в Бийске *' + ms_last + '°C', { "parse_mode": "Markdown" });
             }
           });
         } else {
