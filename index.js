@@ -14,16 +14,13 @@ function doDraw(config, filename) {
   // создадим полотно с размером 640x480 пикселей
 
   var chartNode = new ChartjsNode(640, 480);
-console.log("doDraw");
-console.log(chartNode.width);
-    console.log(config);
+
   return chartNode.drawChart(config)
 
       .then(() => {
 
           // запишем результат в файл
 
-	console.log("!!!!!!!");
           return chartNode.writeImageToFile('image/png', filename);
 
       });
@@ -32,9 +29,6 @@ console.log(chartNode.width);
 
 function prepareDraw0(v_time){
 
-  // переменная, куда сохраним данные
-
-  // var пример;
 
   // создадим Promise сборки данных и конфигурации
 
@@ -44,7 +38,7 @@ function prepareDraw0(v_time){
 
       .then(()=>{
 
-          // произвольные данные, похожие на те, что хранятся в истории
+          // произвольные данные, похожие на те, что хранятся в бд
 
          /* testData = [
 
@@ -231,10 +225,8 @@ setInterval(function () { // функция для повторения запр
   let v_time = [];
   request(URL, function (err, res, body) {
     if (err) throw err;
-    // console.log(body);
     console.log(res.statusCode);
     let flag = 0;
-    // console.log(match);
     let $ = cheerio.load(body);
     let ms_last = ($('html').text());
     ms_last = ms_last.replace(/\r|\n/g, '');
@@ -252,7 +244,6 @@ setInterval(function () { // функция для повторения запр
     let sql = 'SELECT t temp FROM temp_tbl WHERE mark=1 ORDER BY time DESC LIMIT 1';
     db.each(sql, (err, row) => {
       if (err) {
-        // return console.error(err.message);
         reject(err);
       }
       if (row) {
@@ -295,9 +286,7 @@ setInterval(function () { // функция для повторения запр
             console.log('Change:' + this.changes);
           });
         }
-    // db.close();
-    //return 0;
-      //});
+
       return new Promise((resolve, reject) => {
     
         let sql = "SELECT * FROM (SELECT rowid, time tm, t temper FROM temp_tbl ORDER BY time DESC LIMIT 12) ORDER BY rowid";
@@ -305,10 +294,8 @@ setInterval(function () { // функция для повторения запр
        //  first row only
        db.all(sql, (err, rows) => {
          if (err) {
-          // return console.error(err.message);
             reject(err);
          }
-       //if (row)
 	
          rows.forEach((row) => {
                v_time.push({"tm":row.tm, "temper":row.temper});
@@ -317,10 +304,8 @@ setInterval(function () { // функция для повторения запр
        });
        
         resolve(v_time);
-     // return (v_time);
        
        });
-       //resolve(v_time);
        
          })
          .then((v_time) =>{
@@ -346,7 +331,7 @@ bot.onText(/\/start/, msg => { // функция обработки команд
   console.log(msg);
   let flag = 0;
 
-  let ms = "Здравствуйте! Здесь вы можете узнать текущую температуру в городе по данным БТИ АлтГТУ. Для того, чтобы узнать данные о погоде, введите /w. Для того, чтобы подписаться\/отписаться на обновление погоды, введите /f. Сейчас в Бийске ";
+  let ms = "Здравствуйте! Здесь вы можете узнать текущую температуру в городе по данным БТИ АлтГТУ. Для того, чтобы узнать данные о погоде, введите /w. Для того, чтобы подписаться\/отписаться на обновление погоды, введите /f. Для получения графика погоды введите /p. Сейчас в Бийске ";
 
   let db = new sqlite3.Database('/home/Plex/weather-bot/db/bot.db', (err) => {
     if (err) {
@@ -504,7 +489,6 @@ bot.onText(/\/f/, msg => {  // функция обработки команды 
         });
         bot.sendMessage(chatId, '*Вы отписались от изменений температуры!*', { "parse_mode": "Markdown" });
       }
-    //  else console.log('No chat');
     db.close();
     return 0;
   });
@@ -530,7 +514,6 @@ console.log("Send graph");
 bot.on('message', msg => {
   const user = msg.chat.username;
   let mes = msg.text;
- // mes = mes.replace('/', '');
   let db = new sqlite3.Database('/home/Plex/weather-bot/db/bot.db', (err) => {
     if (err) {
       return console.error(err.message);
